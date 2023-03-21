@@ -1,23 +1,30 @@
-from flask import Flask, render_template, request
-import wolframalpha
+from flask import Flask, render_template, request, jsonify
+from googletrans import Translator
 
-app = Flask(__name__)
-client = wolframalpha.Client("P76EK3-XY6TKV2XYW")
+app = Flask(__name__, template_folder='templates')
 
-@app.route("/")
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
-@app.route("/search", methods=["POST"])
-def search():
-    topic = request.form["topic"]
-    query = topic
-    res = client.query(query)
-    result = ""
-    for pod in res.pods:
-        for sub in pod.subpods:
-            result += sub.plaintext + "\n\n"
-    return render_template("result.html", topic=topic, result=result)
+@app.route('/translate', methods=['POST'])
+def translate():
+    # Check for the presence of required keys in the request data
+    required_keys = ['source_lang', 'dest_lang', 'text']
+    if not all(key in request.form for key in required_keys):
+        return jsonify({'error': 'Missing required key(s)'})
 
-if __name__ == "__main__":
+    # Get source and target language codes and text from the request
+    source_lang = request.form['source_lang']
+    dest_lang = request.form['dest_lang']
+    text = request.form['text']
+
+    # Translate the text
+    translator = Translator()
+    translation = translator.translate(text, src=source_lang, dest=dest_lang)
+
+    # Render the result template with the translation
+    return render_template('result.html', translation=translation.text)
+
+if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080, debug=True)
