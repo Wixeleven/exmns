@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Math Topic Search</title>
+	<title>Results for {{ topic }}</title>
 </head>
 <body>
-	<h1>Enter a math topic:</h1>
-	<form method="POST" action="/search">
-		<input type="text" name="topic" required>
-		<input type="submit" value="Search">
-	</form>
+	<h1>Results for {{ topic }}</h1>
+	<pre>{{ result }}</pre>
 </body>
 </html>
